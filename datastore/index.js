@@ -81,7 +81,7 @@ exports.update = (id, text, callback) => {
     } else {
       fs.writeFile(filePath, text, (err) => {
         if (err) {
-          throw (`error writing file: ${err}`);
+          throw (`error updating file: ${err}`);
         } else {
           callback(null, {id: id, text: text});
         }
@@ -89,16 +89,6 @@ exports.update = (id, text, callback) => {
     }
   });
 };
-
-/*
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
-*/
 
 /*
 PUT request - looks up the corresponding file, adjusts it per the next text, then does a callback on it (prob use writeFile)
