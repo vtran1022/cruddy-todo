@@ -14,7 +14,6 @@ exports.create = (text, callback) => {
       if (err) {
         throw (`error writing file: ${err}`);
       } else {
-        items[id] = text;
         callback(null, {id: id, text: text});
       }
     });
@@ -51,7 +50,7 @@ fs has a readdir func(file, callback(err, data))
 
 exports.readOne = (id, callback) => {
   var filePath = path.join(exports.dataDir, `${id}.txt`);
-  fs.readFile(filePath, (err, data)=>{
+  fs.readFile(filePath, (err, data) => {
     if (err) {
       callback(new Error(`No item with id: ${id}`));
     } else {
@@ -75,6 +74,23 @@ fs.readFile can be used here
 */
 
 exports.update = (id, text, callback) => {
+  var filePath = path.join(exports.dataDir, `${id}.txt`);
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      fs.writeFile(filePath, text, (err) => {
+        if (err) {
+          throw (`error writing file: ${err}`);
+        } else {
+          callback(null, {id: id, text: text});
+        }
+      });
+    }
+  });
+};
+
+/*
   var item = items[id];
   if (!item) {
     callback(new Error(`No item with id: ${id}`));
@@ -82,7 +98,7 @@ exports.update = (id, text, callback) => {
     items[id] = text;
     callback(null, { id, text });
   }
-};
+*/
 
 /*
 PUT request - looks up the corresponding file, adjusts it per the next text, then does a callback on it (prob use writeFile)
