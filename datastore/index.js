@@ -12,7 +12,7 @@ exports.create = (text, callback) => {
     var todoFile = path.join(exports.dataDir, `${data}.txt`);
     fs.writeFile(todoFile, text, (err) => {
       if (err) {
-        throw ('error writing file');
+        throw (`error writing file: ${err}`);
       } else {
         items[data] = text;
         callback(null, {id: data, text: text});
