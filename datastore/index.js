@@ -8,14 +8,14 @@ var items = {};
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
-  counter.getNextUniqueId((err, data) => {
-    var todoFile = path.join(exports.dataDir, `${data}.txt`);
+  counter.getNextUniqueId((err, id) => {
+    var todoFile = path.join(exports.dataDir, `${id}.txt`);
     fs.writeFile(todoFile, text, (err) => {
       if (err) {
         throw (`error writing file: ${err}`);
       } else {
-        items[data] = text;
-        callback(null, {id: data, text: text});
+        items[id] = text;
+        callback(null, {id: id, text: text});
       }
     });
   });
@@ -34,6 +34,8 @@ o: an array of todos (sent to client via GET request)
 c: 1) VERY IMPORTANT: at this point in the basic requirements, do not attempt to read the contents of each file that contains the todo item text. Failing to heed this instruction has the potential to send you down a rabbit hole.
   2) must still include a text field in your response to the client, and it's recommended that you use the message's id (that you identified from the filename) for both the id field and the text field.
 e: should return an empty array if no todos
+
+fs has a readdir func(file, callback(err, data))
 */
 
 exports.readOne = (id, callback) => {
@@ -51,6 +53,8 @@ i: id = string, callback (err, data)
 o: will read one todo item from the dataDirc and then the callback is called on it
 c: none
 e: none
+
+fs.readFile can be used here
 */
 
 exports.update = (id, text, callback) => {
@@ -63,6 +67,16 @@ exports.update = (id, text, callback) => {
   }
 };
 
+/*
+PUT request - looks up the corresponding file, adjusts it per the next text, then does a callback on it (prob use writeFile)
+i: id = string, text = string, callback(err, data)
+o: updated txt file
+c: none
+e: if file does not exist then return an error
+
+need to access the file contents somehow then fs.writeFile to 'write over' the contents inside
+*/
+
 exports.delete = (id, callback) => {
   var item = items[id];
   delete items[id];
@@ -73,6 +87,16 @@ exports.delete = (id, callback) => {
     callback();
   }
 };
+
+/*
+DELETE request - looks up corresponding file and delete the file
+i: id = string, callback(err, data)
+o: none
+c: none
+e: if file does not exist, return an error
+
+need to access the file then remove it from dataDir
+*/
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
 
