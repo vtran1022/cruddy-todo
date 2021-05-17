@@ -24,15 +24,20 @@ exports.create = (text, callback) => {
 exports.readAll = (callback) => {
   fs.readdir(exports.dataDir, (err, data) => {
     if (err) {
-      throw (`error reading directory: ${err}`);
+      console.log(`error reading directory: ${err}`);
+      var noData = [];
+      return noData;
     } else {
-      var data = _.map(items, (text, id) => {
-        return {id: id, text: text};
+      var data2 = _.map(data, (element) => {
+        return {id: element.slice(0, 5), text: element.slice(0, 5)};
       });
-      callback(null, data);
+      callback(null, data2);
     }
   });
 };
+
+// data: [ '00001.txt', '00002.txt', '00003.txt', '00004.txt', '00005.txt' ]
+// inside data: an element = '00001.txt'
 
 /*
 i: cb func
