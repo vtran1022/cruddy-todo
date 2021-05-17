@@ -50,13 +50,19 @@ fs has a readdir func(file, callback(err, data))
 */
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  var filePath = path.join(exports.dataDir, `${id}.txt`);
+  fs.readFile(filePath, (err, data)=>{
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      callback(null, {id: id, text: data.toString()});
+    }
+  });
 };
+
+/*
+data: <Buffer 52 52>
+*/
 
 /*
 to read one todo item when a GET request is made - finds the corresponding file in the dataDir to read
