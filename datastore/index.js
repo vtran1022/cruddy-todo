@@ -101,6 +101,24 @@ need to access the file contents somehow then fs.writeFile to 'write over' the c
 */
 
 exports.delete = (id, callback) => {
+  var filePath = path.join(exports.dataDir, `${id}.txt`);
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          throw (`error deleting file: ${err}`);
+        } else {
+          callback();
+          // come back to why callback() here later.....
+        }
+      });
+    }
+  });
+};
+
+/*
   var item = items[id];
   delete items[id];
   if (!item) {
@@ -109,7 +127,7 @@ exports.delete = (id, callback) => {
   } else {
     callback();
   }
-};
+*/
 
 /*
 DELETE request - looks up corresponding file and delete the file
