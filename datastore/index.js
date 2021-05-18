@@ -12,7 +12,7 @@ exports.create = (text, callback) => {
     var todoFile = path.join(exports.dataDir, `${id}.txt`);
     fs.writeFile(todoFile, text, (err) => {
       if (err) {
-        throw (`error writing file: ${err}`);
+        callback(new Error(`error writing file: ${err}`));
       } else {
         callback(null, {id: id, text: text});
       }
@@ -23,9 +23,9 @@ exports.create = (text, callback) => {
 exports.readAll = (callback) => {
   fs.readdir(exports.dataDir, (err, data) => {
     if (err) {
-      console.log(`error reading directory: ${err}`);
-      var noData = [];
-      return noData;
+      callback(new Error(`error reading directory: ${err}`));
+      // var noData = [];
+      // return noData;
     } else {
       var data2 = _.map(data, (element) => {
         return {id: element.slice(0, 5), text: element.slice(0, 5)};
