@@ -116,7 +116,6 @@ exports.delete = (id, callback) => {
           throw (`error deleting file: ${err}`);
         } else {
           callback();
-          // come back to why callback() here later.....
         }
       });
     }
