@@ -29,9 +29,9 @@ exports.readAll = (callback) => {
       var todoFiles = files.map((file) => {
         var id = file.slice(0, 5);
         var filePath = path.join(exports.dataDir, file);
-        return promisefs.readFileAsync(filePath, 'utf8')
-          .then((text) => {
-            return {id: id, text: text};
+        return promisefs.readFileAsync(filePath)
+          .then((fileData) => {
+            return {id: id, text: fileData.toString()};
           });
       });
       Promise.all(todoFiles)
@@ -46,6 +46,53 @@ exports.readAll = (callback) => {
 
 /* data: [ '00001.txt', '00002.txt', '00003.txt', '00004.txt', '00005.txt' ]
 inside data: an element = '00001.txt'
+
+
+-prior to promises refactor
+  fs.readdir(exports.dataDir, (err, data) => {
+    if (err) {
+      throw (`error reading directory: ${err}`);
+    } else {
+        var mappedData = _.map(data, (element) => {
+        return {id: element.slice(0, 5), text: element.slice(0, 5)};
+      });
+      callback(null, mappedData);
+    }
+
+- in solution video
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      return callback(err);
+    } else {
+        var mappedData = _.map(files, (file) => {
+          var id = path.basename(file, '.txt');
+          var filepath = path.join(exports.dataDir, file)
+          fs.readFile(filepath, (fileData) => {
+            return {id: id, text: fileData} -- this is problematic b/c many async funcs running
+          })
+      });
+      callback(null, mappedData);
+    }
+
+- solu video w/ promises
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      return callback(err);
+    } else {
+        var mappedData = _.map(files, (file) => {
+          var id = path.basename(file, '.txt');
+          var filepath = path.join(exports.dataDir, file)
+          return readFilePromise(filepath)
+            .then((fileData) => {
+              return {id: id, text:fileData.toString()}
+            };
+          });
+      });
+      Promise.all(data)
+        .then((items) => {
+          callback(null, items);
+        })
+    }
 
 i: cb func
 o: an array of todos (sent to client via GET request)
