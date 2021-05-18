@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
-
-var items = {};
+const Promise = require('bluebird');
+const promisefs = Promise.promisifyAll(fs);
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
@@ -21,24 +21,29 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  fs.readdir(exports.dataDir, (err, data) => {
-    if (err) {
-      callback(new Error(`error reading directory: ${err}`));
-      // var noData = [];
-      // return noData;
-    } else {
-      var data2 = _.map(data, (element) => {
-        return {id: element.slice(0, 5), text: element.slice(0, 5)};
+  return promisefs.readdirAsync(exports.dataDir)
+    .then((files) => {
+      var todoFiles = files.map((file) => {
+        var id = file.slice(0, 5);
+        var filePath = path.join(exports.dataDir, file);
+        return promisefs.readFileAsync(filePath, 'utf8')
+          .then((text) => {
+            return {id: id, text: text};
+          });
       });
-      callback(null, data2);
-    }
-  });
+      Promise.all(todoFiles)
+        .then((todoFile) => {
+          callback(null, todoFile);
+        });
+    })
+    .catch((err) => {
+      callback(err);
+    });
 };
 
-// data: [ '00001.txt', '00002.txt', '00003.txt', '00004.txt', '00005.txt' ]
-// inside data: an element = '00001.txt'
+/* data: [ '00001.txt', '00002.txt', '00003.txt', '00004.txt', '00005.txt' ]
+inside data: an element = '00001.txt'
 
-/*
 i: cb func
 o: an array of todos (sent to client via GET request)
 c: 1) VERY IMPORTANT: at this point in the basic requirements, do not attempt to read the contents of each file that contains the todo item text. Failing to heed this instruction has the potential to send you down a rabbit hole.
