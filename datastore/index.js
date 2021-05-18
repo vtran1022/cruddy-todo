@@ -9,6 +9,9 @@ const promisefs = Promise.promisifyAll(fs);
 
 exports.create = (text, callback) => {
   counter.getNextUniqueId((err, id) => {
+    if (err) {
+      return callback(err);
+    }
     var todoFile = path.join(exports.dataDir, `${id}.txt`);
     fs.writeFile(todoFile, text, (err) => {
       if (err) {
